@@ -1,22 +1,27 @@
-two week deadline, before winter semester
+Deadline: about two weeks, before winter semester
 
 any implementation, any languages, website?
-    strictly file processiing
-    SQL
+    strictly file processing
+	python, django, csv
+    CI/CD
+	black, flake8, pyright
     website
+	hosted on github pages, buy domain name later?
 
 onlinegdb (CSV file) -> criteria calculations (CSV with calculations) -> (future) prizeversity automation
 
 Goal: automate calculation for onlinegdb bits to prizeversity
 
 criteria
-https://docs.google.com/document/d/19fwYGWtQU8kzcnC_2LZ54JizQnbF-tkGRwVNNqQhp5M/edit?tab=t.0
 
 TODO: organize this from file
-1. if complete DD first 10 in class
-2. if complete 
-3. DD streak 
 
-bit amount determined from criteria
+1. first 10 in class
+2. maintaining perfect submissions streak
+3. completing both DD for that session
+
+Weeks 1 - 4: 10 Bits
+Weeks 5 - 8: 20 Bits
+Weeks 9 - 12: 30 Bits
 
 feat: editable criteria values, non-hardcoded

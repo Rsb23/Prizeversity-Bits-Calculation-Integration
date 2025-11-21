@@ -1,0 +1,22 @@
+two week deadline, before winter semester
+
+any implementation, any languages, website?
+    strictly file processiing
+    SQL
+    website
+
+onlinegdb (CSV file) -> criteria calculations (CSV with calculations) -> (future) prizeversity automation
+
+Goal: automate calculation for onlinegdb bits to prizeversity
+
+criteria
+https://docs.google.com/document/d/19fwYGWtQU8kzcnC_2LZ54JizQnbF-tkGRwVNNqQhp5M/edit?tab=t.0
+
+TODO: organize this from file
+1. if complete DD first 10 in class
+2. if complete 
+3. DD streak 
+
+bit amount determined from criteria
+
+feat: editable criteria values, non-hardcoded

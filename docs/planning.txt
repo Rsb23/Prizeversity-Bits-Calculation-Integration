@@ -14,8 +14,6 @@ Goal: automate calculation for onlinegdb bits to prizeversity
 
 criteria
 
-TODO: organize this from file
-
 1. first 10 in class
 2. maintaining perfect submissions streak
 3. completing both DD for that session

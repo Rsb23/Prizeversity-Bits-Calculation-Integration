@@ -3,13 +3,16 @@ from datetime import datetime, timedelta, timezone
 
 
 class DataHandler:
-    def __init__(self, csvFilePath: str):
-        self.csvData = self.loadFile(csvFilePath)
+    def __init__(self, csvFilePath1: str, csvFilePath2: str):
+        self.csvData1 = self.loadFile(csvFilePath1)
+        self.csvData2 = self.loadFile(csvFilePath2)
         
         self.estTZ = timezone(-timedelta(hours=5))  # EST is 5 hours behind UTC
         self.dueDateDT = datetime(2025, 11, 25, 0, 0, 0, 0, self.estTZ)
         
-        self.firstTenStudents = self.determineFirstTenSubmissions(self.csvData)
+        self.firstTenStudents = self.determineFirstTenSubmissions(self.csvData1)
+
+        self.completedBoth = self.getDualCompletionStudents(self.csvData1, self.csvData2)
         
     def loadFile(self, csvFilePath: str) -> list[list[str]]:
         with open(csvFilePath, newline='') as csv_file:
@@ -97,10 +100,32 @@ class DataHandler:
 
         allStudents.pop(0)  # remove first index which is empty
 
-        sortedStudents = sorted(allStudents, key=lambda x: x[1], reverse=True)
+        sortedStudents = sorted(allStudents, key=lambda x: x[1], reverse=True)  # sort students by timedelta from due date datetime
 
-        firstTenStudents = [i[0] for i in sortedStudents[0:10]]
+        firstTenStudents = [i[0] for i in sortedStudents[0:10]]  # create list of ten students without datetimes, just names sorted with first being the earliest completion
 
         return firstTenStudents
 
-_datahandler = DataHandler('/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/auto_filled.csv')
+    def getDualCompletionStudents(self, csvData1: list[list[str]], csvData2: list[list[str]]) -> list[str]:
+        # create list of names for each csv file as there is one csv for each part of the DD
+        # determine which names appear twice, append to return list
+
+        firstAssignmentNames = [row[1] for row in csvData1]
+        secondAssignmentNames = [row[1] for row in csvData2]
+
+        completedBothNames = []
+
+        # now compare which names are in both
+        if (len(firstAssignmentNames) > len(secondAssignmentNames)):
+            for name in firstAssignmentNames:
+                if secondAssignmentNames.__contains__(name):
+                    completedBothNames.append(name)
+        else:
+            for name in secondAssignmentNames:
+                if firstAssignmentNames.__contains__(name):
+                    completedBothNames.append(name)
+        
+        return completedBothNames
+
+
+_datahandler = DataHandler('/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/submission_done.csv', '/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/auto_filled.csv')

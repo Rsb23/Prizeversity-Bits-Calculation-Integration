@@ -9,7 +9,7 @@ class DataHandler:
         self.estTZ = timezone(-timedelta(hours=5))  # EST is 5 hours behind UTC
         self.dueDateDT = datetime(2025, 11, 25, 0, 0, 0, 0, self.estTZ)
         
-        self.determineFirstTenSubmissions(self.csvData)
+        self.firstTenStudents = self.determineFirstTenSubmissions(self.csvData)
         
     def loadFile(self, csvFilePath: str) -> list[list[str]]:
         with open(csvFilePath, newline='') as csv_file:
@@ -99,7 +99,8 @@ class DataHandler:
 
         sortedStudents = sorted(allStudents, key=lambda x: x[1], reverse=True)
 
-        firstTenStudents = sortedStudents[0:10]
-        print(firstTenStudents)
+        firstTenStudents = [i[0] for i in sortedStudents[0:10]]
+
+        return firstTenStudents
 
 _datahandler = DataHandler('/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/auto_filled.csv')

@@ -5,6 +5,10 @@ from datetime import datetime, timedelta, timezone
 class DataHandler:
     def __init__(self, csvFilePath: str):
         self.csvData = self.loadFile(csvFilePath)
+        
+        self.estTZ = timezone(-timedelta(hours=5))  # EST is 5 hours behind UTC
+        self.dueDateDT = datetime(2025, 11, 25, 0, 0, 0, 0, self.estTZ)
+        
         self.determineFirstTenSubmissions(self.csvData)
         
     def loadFile(self, csvFilePath: str) -> list[list[str]]:
@@ -21,16 +25,10 @@ class DataHandler:
                     data.append(row)
         
         return data
-
-    def determineFirstTenSubmissions(self, csvData: list[list[str]]) -> list[str]:
-        firstTenStudents = []
-
-        for row in csvData:
-            # convert datetime column to datetime obj format for comparison
-            pass
-            
+    
+    def convertCSVStrToDT(self, csvDateTime: str) -> datetime:
         # convert month, day, hour str datetime parts to be zero-padded for parsing with strptime
-        splitDTStr = "2025-11-22, 11:23:15 p.m.".split(', ')
+        splitDTStr = csvDateTime.split(', ')
         
         dateStr = splitDTStr[0]
         newDateStr = ""
@@ -47,8 +45,6 @@ class DataHandler:
                 newDateStr += '-' + subDateStr
             else:
                 newDateStr += subDateStr
-                
-
         
         # next is converting hour to be zero-padded BUT we need to get rid of (convert) a.m. and p.m.
         splitTimeStr = timeStr.split(' ')  # 11:23:15 p.m. -> 11:23:15 + p.m.
@@ -71,13 +67,39 @@ class DataHandler:
         baseDateTime = datetime.strptime(newDateTimeStr, "%Y-%m-%d, %I:%M:%S %p")
 
         # add timezone to datetime obj we just created with strptime
-        estTZ = timezone(-timedelta(hours=5))  # EST is 5 hours behind UTC
-        baseDateTime = baseDateTime.astimezone(estTZ)
-        
-        # calculate difference between datetime objs
-        toCompareDateTime = datetime(2025, 11, 25, 10, 15, 15, 0, estTZ)
-        diff = toCompareDateTime > baseDateTime
+        baseDateTime = baseDateTime.astimezone(self.estTZ)
 
-        print(diff)
+        return baseDateTime
 
-_datahandler = DataHandler('/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/submission_done.csv')
+    def didStudentPassTests(self, csvRow: list[str]) -> bool:
+        # "1 passed of 1"
+        # parse Test Result column
+        splitTestResult = csvRow[2].split(' ')
+
+        if splitTestResult[0] == splitTestResult[3]:
+            return True
+        else:
+            return False
+
+    def calcTimeBetweenSubmissionDueDate(self, submissionDT: datetime, dueDateDT: datetime) -> timedelta:
+        if (submissionDT < dueDateDT):
+            return dueDateDT - submissionDT
+        else:  # if the student submitted after due date
+            return -1
+
+    def determineFirstTenSubmissions(self, csvData: list[list[str]]) -> list[str]:
+        allStudents = [[]]
+
+        # populate allStudents with list of all student names and their timedelta due date datetime - submission datetime, (largest value will be considered more early)
+        for row in csvData:
+            if (self.didStudentPassTests(row)):
+                allStudents.append([row[1], self.calcTimeBetweenSubmissionDueDate(self.convertCSVStrToDT(row[4]), self.dueDateDT)])
+
+        allStudents.pop(0)  # remove first index which is empty
+
+        sortedStudents = sorted(allStudents, key=lambda x: x[1], reverse=True)
+
+        firstTenStudents = sortedStudents[0:10]
+        print(firstTenStudents)
+
+_datahandler = DataHandler('/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/auto_filled.csv')

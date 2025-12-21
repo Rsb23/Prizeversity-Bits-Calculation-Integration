@@ -11,8 +11,8 @@ class DataHandler:
         self.dueDateDT = datetime(2025, 11, 25, 0, 0, 0, 0, self.estTZ)
         
         # TESTING
-        self.firstTenStudents = self.determineFirstNSubmissions(self.csvData1)
-        self.firstTenStudents2 = self.determineFirstNSubmissions(self.csvData2)
+        self.firstTenStudents = self.determineFirstNSubmissions(self.csvData1, 10)
+        self.firstTenStudents2 = self.determineFirstNSubmissions(self.csvData2, 10)
         self.completedBoth = self.getDualCompletionStudents(self.csvData1, self.csvData2)
         
     def loadFile(self, csvFilePath: str) -> list[list[str]]:
@@ -92,7 +92,7 @@ class DataHandler:
         else:  # if the student submitted after due date
             return -1
 
-    def determineFirstNSubmissions(self, csvData: list[list[str]]) -> list[str]:
+    def determineFirstNSubmissions(self, csvData: list[list[str]], n: int) -> list[str]:
         # TODO: "N" from settings
         allStudents = [[]]
 
@@ -106,7 +106,7 @@ class DataHandler:
         sortedStudents = sorted(allStudents, key=lambda x: x[1], reverse=True)  # sort students by timedelta from due date datetime
 
         # put N for 10 in list slice below
-        firstNStudents = [i[0] for i in sortedStudents[0:10]]  # create list of ten students without datetimes, just names sorted with first being the earliest completion
+        firstNStudents = [i[0] for i in sortedStudents[0:n]]  # create list of ten students without datetimes, just names sorted with first being the earliest completion
 
         return firstNStudents
 

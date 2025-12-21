@@ -10,8 +10,9 @@ class DataHandler:
         self.estTZ = timezone(-timedelta(hours=5))  # EST is 5 hours behind UTC
         self.dueDateDT = datetime(2025, 11, 25, 0, 0, 0, 0, self.estTZ)
         
-        self.firstTenStudents = self.determineFirstTenSubmissions(self.csvData1)
-
+        # TESTING
+        self.firstTenStudents = self.determineFirstNSubmissions(self.csvData1)
+        self.firstTenStudents2 = self.determineFirstNSubmissions(self.csvData2)
         self.completedBoth = self.getDualCompletionStudents(self.csvData1, self.csvData2)
         
     def loadFile(self, csvFilePath: str) -> list[list[str]]:
@@ -85,12 +86,14 @@ class DataHandler:
             return False
 
     def calcTimeBetweenSubmissionDueDate(self, submissionDT: datetime, dueDateDT: datetime) -> timedelta:
+        # determine if submissions occur after due date, helper func
         if (submissionDT < dueDateDT):
             return dueDateDT - submissionDT
         else:  # if the student submitted after due date
             return -1
 
-    def determineFirstTenSubmissions(self, csvData: list[list[str]]) -> list[str]:
+    def determineFirstNSubmissions(self, csvData: list[list[str]]) -> list[str]:
+        # TODO: "N" from settings
         allStudents = [[]]
 
         # populate allStudents with list of all student names and their timedelta due date datetime - submission datetime, (largest value will be considered more early)
@@ -102,11 +105,13 @@ class DataHandler:
 
         sortedStudents = sorted(allStudents, key=lambda x: x[1], reverse=True)  # sort students by timedelta from due date datetime
 
-        firstTenStudents = [i[0] for i in sortedStudents[0:10]]  # create list of ten students without datetimes, just names sorted with first being the earliest completion
+        # put N for 10 in list slice below
+        firstNStudents = [i[0] for i in sortedStudents[0:10]]  # create list of ten students without datetimes, just names sorted with first being the earliest completion
 
-        return firstTenStudents
+        return firstNStudents
 
     def getDualCompletionStudents(self, csvData1: list[list[str]], csvData2: list[list[str]]) -> list[str]:
+        # Helper func for determining which students completed both DD versions for the week
         # create list of names for each csv file as there is one csv for each part of the DD
         # determine which names appear twice, append to return list
 

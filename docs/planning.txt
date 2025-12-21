@@ -23,3 +23,10 @@ Weeks 5 - 8: 20 Bits
 Weeks 9 - 12: 30 Bits
 
 feat: editable criteria values, non-hardcoded
+
+example website: https://www.freeconvert.com/video-converter
+    input file -> output file
+
+pythonanywhere free tier -> paid
+LetsEncrypt
+stretch goal: 90 days, clear SQL tables

@@ -85,7 +85,7 @@ class DataHandler:
         else:
             return False
 
-    def calcTimeBetweenSubmissionDueDate(self, submissionDT: datetime, dueDateDT: datetime) -> timedelta:
+    def calcTimeBetweenSubmissionDueDate(self, submissionDT: datetime, dueDateDT: datetime) -> timedelta | int:
         # determine if submissions occur after due date, helper func
         if (submissionDT < dueDateDT):
             return dueDateDT - submissionDT

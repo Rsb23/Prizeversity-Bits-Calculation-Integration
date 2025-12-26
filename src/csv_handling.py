@@ -131,6 +131,10 @@ class DataHandler:
                     completedBothNames.append(name)
         
         return completedBothNames
+    
+    def getStreakContinuationStudents(self, allCsvData: list[list[list[str]]]) -> list[str] | int:
+        # TODO
+        return -1
 
 
 _datahandler = DataHandler('/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/submission_done.csv', '/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/auto_filled.csv')

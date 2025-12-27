@@ -1151,9 +1151,6 @@
       }
     }
   }
-  .mt-1 {
-    margin-top: calc(var(--spacing) * 1);
-  }
   .mb-1 {
     margin-bottom: calc(var(--spacing) * 1);
   }

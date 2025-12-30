@@ -1,7 +1,9 @@
 from django.db import models
 
 # Create your models here.
-class LabSection(models.Model):
-    dateCreated = models.DateField()
-    timeCreated = models.TimeField()
-    crn = models.IntegerField()
+
+# class LabSections(models.Model):
+    # csvFiles = models.FilePathField()
+    # upload_date = models.DateTimeField()
+    # outputCSVFiles = models.FilePathField()
+    # crn = models.IntegerField()

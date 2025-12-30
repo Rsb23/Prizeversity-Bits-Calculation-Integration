@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import LabSection
+# from .models import LabSections
 
 # Register your models here.
-admin.site.register(LabSection)
+# admin.site.register(LabSections)

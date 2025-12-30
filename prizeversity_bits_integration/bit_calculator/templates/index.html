@@ -9,6 +9,8 @@
     Normalization</a>
 {% endblock csv_normalization_btn %}
 {% block content %}
+<form action="/new-csv-upload/" enctype="multipart/form-data" method="post">
+{% csrf_token %}
 <div class="flex flex-col justify-center gap-y-2">
     <div class="card bg-black p-5 mb-1 self-center w-200">
         <div class="flex flex-row justify-between">
@@ -16,7 +18,7 @@
                 <p class="text-lg self-center font-bold">Step 1</p>
                 <p class="text-sm self-center text-gray-500">Choose CSV From OnlineGDB</p>
             </div>
-            <input type="file" accept=".csv, text/csv" class="file-input file-input-primary self-center w-100">
+            <input onchange="enableSubmit()" multiple type="file" accept=".csv" class="required file-input file-input-primary self-center w-100">
         </div>
     </div>
     <div class="card bg-black p-5 mb-1 self-center w-200">
@@ -39,7 +41,7 @@
                 <p class="text-lg self-center font-bold">Step 3</p>
                 <p class="text-sm self-center text-gray-500">Weekly Bit Rewards</p>
             </div>
-            <input type="text" placeholder="e.g. 10,30,20,20" class="input input-primary border w-100" />
+            <input onchange="enableSubmit()" type="text" placeholder="e.g. 10,30,20,20" class="required input input-primary border w-100" />
         </div>
     </div>
     <div class="card bg-black p-5 mb-1 self-center w-200">
@@ -54,7 +56,7 @@
                         <input type="checkbox" checked="checked" class="checkbox checkbox-primary self-center" />
                         <p class="self-center text-sm">First N Submissions Bonus</p>
                     </div>
-                    <input type="text" placeholder="Input N" class="input input-primary border w-50 self-center" />
+                    <input type="text" onchange="enableSubmit()" placeholder="Input N" class="input input-primary border w-50 self-center" />
                 </div>
                 <div class="flex flex-row justify-between gap-x-2">
                     <div class="flex flex-row justify-between gap-x-2">
@@ -70,7 +72,7 @@
             </div>
         </div>
     </div>
-    <button class="btn bg-orange-700 w-80 h-10 self-center text-center mb-5" onclick="myFunction()">Generate</button>
+    <button type="submit" disabled="false" id="generate_btn" class="btn bg-orange-700 w-80 h-10 self-center text-center mb-5">Generate</button>
     <div class="flex flex-row justify-center gap-x-2">
         <div class="card bg-black p-5 mb-1 self-center w-200">
             <div class="flex flex-col">
@@ -119,4 +121,5 @@
 
     </div>
 </div>
+</form>
 {% endblock content %}

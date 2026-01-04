@@ -11,7 +11,8 @@
     <!-- PROD: {% tailwind_preload_css %} -->
     {% tailwind_css %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="{% static 'bit_calculator/input_checker.js' %}"></script>
+    <!--<script src="{% static 'bit_calculator/input_checker.js' %}"></script> -->
+    <script src="{% static 'bit_calculator/week_iterator.js' %}"></script>
 </head>
 
 <body class="flex flex-col min-h-screen">
@@ -27,7 +28,8 @@
                     Normalization</a>
                 {% endblock csv_normalization_btn %}
             </div>
-            <label class="toggle text-base-content self-center">
+            <!--FIX: toggle -> btn -->
+            <label class="toggle text-base-content self-center w-15">
                 <input type="checkbox" value="synthwave" class="theme-controller" />
                 <svg aria-label="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <g stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none"
@@ -52,7 +54,7 @@
             </label>
         </div>
     </div>
-    <main class="flex-grow p-10 bg-gradient-to-br from-blue-800 to-violet-950">
+    <main class="flex-grow p-10 bg-gradient-to-br from-slate-600 to-slate-900">
         {% block content %}
         {% endblock content %}
     </main>

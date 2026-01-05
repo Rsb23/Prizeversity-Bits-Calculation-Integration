@@ -1,6 +1,5 @@
 {% load static tailwind_tags %}
 {% load widget_tweaks %}
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,8 +11,6 @@
     <!-- PROD: {% tailwind_preload_css %} -->
     {% tailwind_css %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!--<script src="{% static 'bit_calculator/input_checker.js' %}"></script> -->
-    <!-- <script src="{% static 'bit_calculator/week_iterator.js' %}"></script> -->
 </head>
 
 <body class="flex flex-col min-h-screen">
@@ -113,6 +110,8 @@
         </nav>
     -->
     </footer>
+{% block body_js %}
+{% endblock body_js %}
 </body>
 
 </html>

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Bits Calculator{% endblock title %}
+{% block bits_calculator_btn %}
+<a href="{% url 'index' %}" class="btn btn-outline btn-primary w-50 text-base rounded-l">Bits
+    Calculator</a>
+{% endblock bits_calculator_btn %}
+{% block csv_normalization_btn %}
+<a href="{% url 'csv' %}" class="btn btn-outline btn-primary w-50 h-8 text-sm rounded-l">CSV
+    Normalization</a>
+{% endblock csv_normalization_btn %}
+{% block content %}
+<form action="" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    <div class="flex flex-col justify-center gap-y-2">
+        <div class="card bg-black p-5 mb-1 self-center w-200">
+            <div class="flex flex-row justify-between">
+                <div class="flex flex-row justify-center gap-x-5">
+                    <p class="text-lg self-center font-bold">Step 1</p>
+                    <p class="text-sm self-center">Choose CSV From OnlineGDB</p>
+                </div>
+                {{ form.file|add_class:"required file-input file-input-primary self-center w-100"|attr:"accept:.csv" }}
+                {% if form.file.errors %}<p class="text-red-500 text-sm">{{ form.file.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="card bg-black p-5 mb-1 self-center w-200">
+            <div class="flex flex-row justify-between">
+                <div class="flex flex-row justify-center gap-x-5">
+                    <p class="text-lg self-center font-bold">Step 2</p>
+                    <p class="text-sm self-center">Select Lab Section CRN</p>
+                </div>
+                {{ form.crn|add_class:"select select-primary w-100" }}
+                {% if form.crn.errors %}<p class="text-red-500 text-sm">{{ form.crn.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="card bg-black p-5 mb-1 self-center w-200">
+            <div class="flex flex-row justify-between">
+                <div class="flex flex-row justify-center gap-x-5">
+                    <p class="text-lg self-center font-bold">Step 3</p>
+                    <p class="text-sm self-center">Weekly Bit Rewards</p>
+                </div>
+                <div class="flex flex-col justify-center">
+                    <div class="flex flex-row">
+                        <p class="self-center px-3 text-sm">Week 1</p>
+                        {{ form.bitRewards|add_class:"required input input-primary border w-100"|attr:"type:number" }}
+                        {% if form.bitRewards.errors %}<p class="text-red-500 text-sm">{{ form.bitRewards.errors.0 }}
+                        </p>{% endif %}
+                    </div>
+                    <button id="add_week_btn" onclick="addWeek()"
+                        class="btn bg-primary w-30 h-10 self-center text-center mt-3">Add Another<button>
+                </div>
+            </div>
+        </div>
+        <div class="card bg-black p-5 mb-1 self-center w-200">
+            <div class="flex flex-row justify-between">
+                <div class="flex flex-row justify-center gap-x-5">
+                    <p class="text-lg self-center font-bold">Step 4</p>
+                    <p class="text-sm self-center">Select Calculation Criteria</p>
+                </div>
+                <div class="flex flex-col justify-between gap-y-3">
+                    <div class="flex flex-row justify-between gap-x-2">
+                        <div class="flex flex-row justify-between gap-x-2">
+                            {{ form.firstNSubmissionBonus|add_class:"checkbox checkbox-primary self-center" }}
+                            <p class="self-center text-sm">First N Submissions Bonus</p>
+                        </div>
+                        {{ form.n|add_class:"input input-primary border w-50 self-center"|attr:"type:number" }}
+                    </div>
+                    <div class="flex flex-row justify-between gap-x-2">
+                        <div class="flex flex-row justify-between gap-x-2">
+                            {{ form.submissionStreak|add_class:"checkbox checkbox-primary self-center" }}
+                            <p class="self-center text-sm">Submission Streaks</p>
+                        </div>
+                        {{ form.streakWeeks|add_class:"input input-primary border w-50"|attr:"type:number" }}
+                    </div>
+                    <div class="flex flex-row justify-center gap-x-2">
+                        {{ form.dualCompletion|add_class:"checkbox checkbox-primary self-center" }}
+                        <p class="self-center text-sm">Dual Completion</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="submit" id="generate_btn"
+            class="btn bg-orange-700 w-80 h-10 self-center text-center mb-5">Generate</button>
+    </div>
+</form>
+<div class="flex flex-row justify-center gap-x-2">
+    <div class="card bg-black p-5 mb-1 self-center w-200">
+        <div class="flex flex-col">
+            <p class="text-base self-center text-center font-bold">Uploaded Files</p>
+            <ul class="h-48 p-2 text-sm text-body font-medium overflow-y-scroll" aria-labelledby="dropdownUsersButton">
+                <li>
+                    <div class="flex flex-row justify-left">
+                        <button class="btn btn-ghost bg-black border-none">
+                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 13V4M7 14H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2m-1-5-4 5-4-5m9 8h.01" />
+                            </svg>
+                        </button>
+                        <p class="self-center text-base">10-09-2026.csv</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="card bg-black p-5 mb-1 self-center w-200">
+        <div class="flex flex-col">
+            <p class="text-base self-center text-center font-bold">Generated Files</p>
+            <ul class="h-48 p-2 text-sm text-body font-medium overflow-y-scroll" aria-labelledby="dropdownUsersButton">
+                <li>
+                    <div class="flex flex-row justify-left">
+                        <button class="btn btn-ghost bg-black border-none">
+                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                                viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M12 13V4M7 14H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2m-1-5-4 5-4-5m9 8h.01" />
+                            </svg>
+                        </button>
+                        <p class="self-center text-base">10-09-2026.csv</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock content %}

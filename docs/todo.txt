@@ -1,0 +1,22 @@
+Form
+    validate uploaded file
+    multiple file uploads
+        either dynamic widget OR multiple selection
+        would need to update handling
+    better CRN selection widget
+    dynamic weekly bit rewards
+        how to send with POST (because size varies)
+    required fields for step 1,2,3 disable generate btn
+    calculation criteria disable based on checkbox
+    input fields should be numbers only
+
+Files
+    query uploadedfiles table -> update
+    query generatedfiles table -> update
+    ability to remove (small delete btn, trash icon)
+    dynamically add uploaded file to uploadedfiles table -> update
+    dynamically add generated file to generatedfiles table -> update
+    
+Admin
+    admin panel customization
+    setup access (PROD)

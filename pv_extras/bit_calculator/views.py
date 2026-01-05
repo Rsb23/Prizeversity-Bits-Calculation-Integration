@@ -57,6 +57,7 @@ def index(request):
                 return HttpResponse('INVALID CSV, FILE TOO LARGE (' + f'{file.size}' + ' B)')
         else:
             logger.info('form invalid')
-    else:
-        form = CSVFileUploadForm()
-        return render(request, "index.html", {'form': form})
+
+    form = CSVFileUploadForm()
+    return render(request, "index.html", {'form': form})
+

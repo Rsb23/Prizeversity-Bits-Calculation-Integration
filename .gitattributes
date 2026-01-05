@@ -3,6 +3,7 @@ requirements.txt filter=lfs diff=lfs merge=lfs -text
 venv filter=lfs diff=lfs merge=lfs -text
 data filter=lfs diff=lfs merge=lfs -text
 docs filter=lfs diff=lfs merge=lfs -text
+prizeversity_bits_integration/bit_calculator/static/css/tailwindcss filter=lfs diff=lfs merge=lfs -text
 *.yml filter=lfs diff=lfs merge=lfs -text
 *.gitignore filter=lfs diff=lfs merge=lfs -text
 *.csv filter=lfs diff=lfs merge=lfs -text

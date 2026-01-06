@@ -7,8 +7,8 @@ function hideAfterTimeout(){
     }
 
     if (elem2){
-        elem2.classList.toggle('border-1');
-        elem2.classList.toggle('border-error');
+        elem2.classList.remove('border-1');
+        elem2.classList.remove('border-error');
     }
 }
 setTimeout(() => {hideAfterTimeout()}, 3000);

@@ -33,7 +33,12 @@
                     <p class="text-sm self-center text-base-content">Select Lab Section CRN</p>
                 </div>
                 <fieldset>
-                    {{ form.crn|add_class:"required input input-primary validator w-100"|attr:"type:number"|attr:"min:1"|attr:"value:1"}}
+                    {{ form.crn|add_class:"required input input-primary validator w-100"|attr:"type:number"|attr:"min:1"|attr:"value:1"|attr:"list=saved_crn"}}
+                    <datalist id="saved_crn">
+                        {% for crn in crn_data %}
+                            <option value="{{ crn }}"></option>
+                        {% endfor %}
+                    </datalist>
                     <p class="hidden validator-hint">Invalid CRN Number</p>
                 </fieldset>
             </div>

@@ -18,3 +18,11 @@ class GeneratedFiles(models.Model):
 
     def __str__(self):
         return self.input_file.name
+
+class CRN(models.Model):
+    crn = models.IntegerField()
+    upload_date = models.DateField(auto_now_add=True)
+    upload_time = models.TimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.crn)

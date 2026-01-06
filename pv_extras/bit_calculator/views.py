@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from .forms import CSVFileUploadForm
 import logging
 from .src.file_validator import FileValidator
-from .models import UploadedFiles, GeneratedFiles
+from .models import UploadedFiles, GeneratedFiles, CRN
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +21,17 @@ def faq(request):
 def index(request):
     if request.method == 'POST':
         form = CSVFileUploadForm(request.POST, request.FILES)
+
+
         if form.is_valid():
             logger.info('form valid, can do stuff now')
+        
+            # check if CRN exists, if it doesn't, add to database
+            try:
+                CRN.objects.get(pk=form.cleaned_data['crn'])
+            except CRN.DoesNotExist:
+                newCRN = CRN(crn=int(form.cleaned_data['crn']))
+                newCRN.save()
 
             # we already checked uploaded file extension with
             # filter (in file dialog, HTML accept attr)
@@ -52,12 +61,12 @@ def index(request):
                 uploadedFile.save()
                 
                 newForm = CSVFileUploadForm()
-                return render(request, "index.html", {'form': newForm})
+                return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all()})
             else:
                 return HttpResponse('INVALID CSV, FILE TOO LARGE (' + f'{file.size}' + ' B)')
         else:
             logger.info('form invalid')
 
     form = CSVFileUploadForm()
-    return render(request, "index.html", {'form': form})
+    return render(request, "index.html", {'form': form, 'crn_data': CRN.objects.all()})
 

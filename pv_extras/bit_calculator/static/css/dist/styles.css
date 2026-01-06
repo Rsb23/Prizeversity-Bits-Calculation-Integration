@@ -1425,9 +1425,6 @@
       --input-color: var(--color-primary);
     }
   }
-  .disabled\:text-base-content:disabled {
-    color: var(--color-base-content);
-  }
   .disabled\:text-white\/50:disabled {
     color: color-mix(in srgb, #fff 50%, transparent);
   }

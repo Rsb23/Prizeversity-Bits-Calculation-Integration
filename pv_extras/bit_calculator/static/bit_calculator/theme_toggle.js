@@ -11,8 +11,6 @@ function toggleTheme(){
     }
 }
 
-document.addEventListener('DOMContentLoaded', (event) => {toggleTheme()});
-
 var elem = document.getElementById('themeChbx');
 
 if (elem){

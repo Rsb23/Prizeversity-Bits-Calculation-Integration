@@ -61,12 +61,12 @@ def index(request):
                 uploadedFile.save()
                 
                 newForm = CSVFileUploadForm()
-                return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all()})
+                return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all()})
             else:
                 return HttpResponse('INVALID CSV, FILE TOO LARGE (' + f'{file.size}' + ' B)')
         else:
             logger.info('form invalid')
 
     form = CSVFileUploadForm()
-    return render(request, "index.html", {'form': form, 'crn_data': CRN.objects.all()})
+    return render(request, "index.html", {'form': form, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all()})
 

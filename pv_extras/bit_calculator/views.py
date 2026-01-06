@@ -48,11 +48,13 @@ def index(request):
             file_content_type = file.content_type
 
             if file.size < 4096:  # change max size based on PROD memory avaiable and max onlinegdb expected file size
-                if file_content_type != 'text/csv' and file_content_type != 'application/csv':
-                    return HttpResponse('INVALID CSV')
+                if file_content_type != 'text/csv' and file_content_type != 'application/csv': 
+                    newForm = CSVFileUploadForm()
+                    return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': True, 'file_error_msg': 'Invalid File Type (CSV Only)'})
                 
                 if not _FileValidator.isCSVFile(content):
-                    return HttpResponse('INVALID CSV')
+                    newForm = CSVFileUploadForm()
+                    return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': True, 'file_error_msg': 'Invalid File Type (CSV Only)'})
                 
                 uploadedFile = UploadedFiles(crn=int(form.cleaned_data['crn']), input_file=file, processed=True)
                 
@@ -61,12 +63,15 @@ def index(request):
                 uploadedFile.save()
                 
                 newForm = CSVFileUploadForm()
-                return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all()})
+                return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': False})
             else:
-                return HttpResponse('INVALID CSV, FILE TOO LARGE (' + f'{file.size}' + ' B)')
+                newForm = CSVFileUploadForm()
+                return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': True, 'file_error_msg': 'File Too Large (' + f'{file.size}' + ' B)'})
         else:
             logger.info('form invalid')
+            newForm = CSVFileUploadForm()
+            return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': True, 'file_error_msg': 'Invalid File'})
 
     form = CSVFileUploadForm()
-    return render(request, "index.html", {'form': form, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all()})
+    return render(request, "index.html", {'form': form, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': False})
 

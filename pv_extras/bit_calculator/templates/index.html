@@ -14,7 +14,11 @@
 <form action="" enctype="multipart/form-data" method="post">
     {% csrf_token %}
     <div class="flex flex-col justify-center gap-y-2">
-        <div class="card bg-base-100 p-5 mb-1 self-center w-200">
+        {% if file_error %}
+            <div class="card bg-base-100 p-5 mb-1 self-center border-1 border-error w-200" id="file_card">
+        {% else %}
+            <div class="card bg-base-100 p-5 mb-1 self-center w-200" id="file_card">
+        {% endif %}
             <div class="flex flex-row justify-between">
                 <div class="flex flex-row justify-center gap-x-5">
                     <p class="text-lg self-center font-bold text-base-content">Step 1</p>
@@ -22,7 +26,11 @@
                 </div>
                 <fieldset>
                     {{ form.file|add_class:"required file-input file-input-primary validator self-center w-100"|attr:"accept:.csv" }}
-                    <p class="hidden validator-hint">Invalid File / No File Selected</p>
+                    {% if file_error %}
+                        <p class="text-error text-sm" id="file_error_msg">{{ file_error_msg }}</p>
+                    {% else %}
+                        <p class="hidden validator-hint">Invalid File / No File Selected</p>
+                    {% endif %}
                 </fieldset>
             </div>
         </div>
@@ -98,7 +106,7 @@
     <div class="card bg-base-100 p-5 mb-1 self-center w-200">
         <div class="flex flex-col">
             <p class="text-base-content self-center text-center font-bold">Uploaded Files</p>
-            <ul class="h-48 p-2 text-sm text-body font-medium overflow-y-scroll" aria-labelledby="dropdownUsersButton">
+            <ul class="h-50 p-2 text-sm text-body font-medium overflow-y-scroll" aria-labelledby="dropdownUsersButton">
                 {% for uploaded_file in up_files_data %}
                 <li>
                     <div class="flex flex-row justify-left">
@@ -121,7 +129,7 @@
     <div class="card bg-base-100 p-5 mb-1 self-center w-200">
         <div class="flex flex-col">
             <p class="text-base-content self-center text-center font-bold">Generated Files</p>
-            <ul class="h-48 p-2 text-sm text-body font-medium overflow-y-scroll" aria-labelledby="dropdownUsersButton">
+            <ul class="h-50 p-2 text-sm text-body font-medium overflow-y-scroll" aria-labelledby="dropdownUsersButton">
                 {% for generated_file in gen_files_data %}
                 <li>
                     <div class="flex flex-row justify-left">
@@ -146,4 +154,5 @@
 {% block body_js %}
 <script src="{% static 'bit_calculator/checkbox_disable_input.js' %}"></script>
 <script src="{% static 'bit_calculator/generate_btn_state.js' %}"></script>
+<script src="{% static 'bit_calculator/file_validation_error_msg.js' %}"></script>
 {% endblock body_js %}

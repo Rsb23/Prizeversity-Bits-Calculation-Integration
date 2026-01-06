@@ -1143,8 +1143,8 @@
   .h-10 {
     height: calc(var(--spacing) * 10);
   }
-  .h-48 {
-    height: calc(var(--spacing) * 48);
+  .h-50 {
+    height: calc(var(--spacing) * 50);
   }
   .min-h-screen {
     min-height: 100vh;
@@ -1245,9 +1245,16 @@
     border-style: var(--tw-border-style);
     border-width: 0px;
   }
+  .border-1 {
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+  }
   .border-none {
     --tw-border-style: none;
     border-style: none;
+  }
+  .border-error {
+    border-color: var(--color-error);
   }
   .bg-base-100 {
     background-color: var(--color-base-100);
@@ -1350,6 +1357,9 @@
   }
   .text-base-content {
     color: var(--color-base-content);
+  }
+  .text-error {
+    color: var(--color-error);
   }
   .text-gray-500 {
     color: var(--color-gray-500);

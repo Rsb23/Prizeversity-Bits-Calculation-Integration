@@ -6,6 +6,7 @@
 
 <head>
     <title>{% block title %}{% endblock title %}</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'bit_calculator/icons/calculator-minimalistic-svgrepo-com.svg' %}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -98,7 +99,7 @@
         </nav>
     -->
     </footer>
-    <script src="{% static 'bit_calculator/theme_toggle.js' %}"></script>
+    <script src="{% static 'bit_calculator/js/theme_toggle.js' %}"></script>
     {% block body_js %}
     {% endblock body_js %}
 </body>

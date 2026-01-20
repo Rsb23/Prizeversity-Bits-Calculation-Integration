@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
-from .forms import CSVFileUploadForm
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse
+from django.conf import settings
+from .forms import CSVFileUploadForm, BitRewardsFormSet
 import logging
+import os
 from .src.file_validator import FileValidator
 from .models import UploadedFiles, GeneratedFiles, CRN
 
@@ -20,10 +22,12 @@ def faq(request):
 
 def index(request):
     if request.method == 'POST':
-        form = CSVFileUploadForm(request.POST, request.FILES)
+        form = CSVFileUploadForm(request.POST, request.FILES, prefix='main_form')
+        bit_rewards_formset = BitRewardsFormSet(request.POST, prefix="bit_rewards_formset")
 
+        logger.info(request.POST)
 
-        if form.is_valid():
+        if form.is_valid() and bit_rewards_formset.is_valid():
             logger.info('form valid, can do stuff now')
         
             # check if CRN exists, if it doesn't, add to database
@@ -63,15 +67,41 @@ def index(request):
                 uploadedFile.save()
                 
                 newForm = CSVFileUploadForm()
-                return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': False})
+                bit_rewards_formset = BitRewardsFormSet(prefix="bit_rewards_formset")
+                return render(request, "index.html", {'form': newForm, 'bit_rewards': bit_rewards_formset, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': False})
             else:
                 newForm = CSVFileUploadForm()
-                return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': True, 'file_error_msg': 'File Too Large (' + f'{file.size}' + ' B)'})
+                bit_rewards_formset = BitRewardsFormSet(prefix="bit_rewards_formset")
+                return render(request, "index.html", {'form': newForm, 'bit_rewards': bit_rewards_formset, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': True, 'file_error_msg': 'File Too Large (' + f'{file.size}' + ' B)'})
         else:
             logger.info('form invalid')
-            newForm = CSVFileUploadForm()
-            return render(request, "index.html", {'form': newForm, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': True, 'file_error_msg': 'Invalid File'})
+            newForm = CSVFileUploadForm(prefix='main_form')
+            bit_rewards_formset = BitRewardsFormSet(prefix="bit_rewards_formset")
+            return render(request, "index.html", {'form': newForm, 'bit_rewards': bit_rewards_formset, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': True, 'file_error_msg': 'Invalid File'})
 
-    form = CSVFileUploadForm()
-    return render(request, "index.html", {'form': form, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': False})
+    newForm = CSVFileUploadForm(prefix='main_form')
+    bit_rewards_formset = BitRewardsFormSet(prefix="bit_rewards_formset")
+    return render(request, "index.html", {'form': newForm, 'bit_rewards': bit_rewards_formset, 'crn_data': CRN.objects.all(), 'gen_files_data': GeneratedFiles.objects.all(), 'up_files_data': UploadedFiles.objects.all(), 'file_error': False})
 
+def download_uploaded_file(request):
+    if request.method == "POST":
+        try:
+            fileToDownload = UploadedFiles.objects.filter(crn=request.POST.get('crn')).filter(input_file=request.POST.get('input_file_name'))
+            logger.info(fileToDownload)
+            return FileResponse(open(os.path.join(settings.MEDIA_ROOT, request.POST.get('input_file_name')), 'rb'), as_attachment=True)
+        except:
+            return redirect('index')
+
+    return redirect('index')
+
+def remove_uploaded_file(request):
+    if request.method == "POST":
+        try:
+            row = UploadedFiles.objects.filter(crn=request.POST.get('crn')).filter(input_file=request.POST.get('input_file_name'))
+            row.delete()
+
+            return redirect('index')
+        except:
+            return redirect('index')
+            
+    return redirect('index')

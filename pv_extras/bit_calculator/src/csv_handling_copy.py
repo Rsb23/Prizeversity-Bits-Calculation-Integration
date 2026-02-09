@@ -40,43 +40,44 @@ class DataHandler:
         
         return [row[1] for row in self.csvData2]
 
-    def createOutputFile(self, nSubmissions: bool = False, n: int = 5, submissionStreak: bool = False, streakWeeks: list[int] = [], dualComp: bool = False) -> io.StringIO:
+    def createOutputFile(self, nSubmissions: bool = False, n: int = 5, firstNBonusPoints: int = 10, submissionStreak: bool = False, streakWeeks: list[int] = [], streakBonusPoints: int = 10, dualComp: bool = False, dualBonusPoints: int = 10) -> io.StringIO:
         if nSubmissions:
-            firstTenStudents = self.determineFirstNSubmissions(self.csvData1, 10, self.dueDate1DT)
-            firstTenStudents2 = self.determineFirstNSubmissions(self.csvData2, 10, self.dueDate2DT)
+            firstTenStudents = self.determineFirstNSubmissions(n, self.dueDate1DT, True)
+            firstTenStudents2 = self.determineFirstNSubmissions(n, self.dueDate2DT, False)
         
         if submissionStreak:
            pass 
 
         if dualComp:
-            dualCompStudents = self.getDualCompletionStudents(self.csvData1, self.csvData2)
+            dualCompStudents = self.getDualCompletionStudents()
         
         # write data
         csv_buff = io.StringIO()
-        csv_writer = csv.writer(csv_buff, delimiter=',')
 
-        for student in self.getListOfStudents():
-            rowToWrite = []
-            rowToWrite.append(student)
+        with open('output.csv', 'w', newline='') as outputWriter:
+            csv_writer = csv.writer(outputWriter, delimiter=',')
 
-            points = 0
+            for student in self.getListOfStudents():
+                rowToWrite = []
+                rowToWrite.append(student)
 
-            if (student in firstTenStudents):
-                points += 5
-            if (student in firstTenStudents2):
-                points += 5
+                points = 0
+
+                if (student in firstTenStudents):
+                    points += firstNBonusPoints
+                if (student in firstTenStudents2):
+                    points += firstNBonusPoints
+                
+                # TODO: submissionStreak points
+
+                if (student in dualCompStudents):
+                    points += dualBonusPoints
+                
+                rowToWrite.append(points)
+                
+                csv_writer.writerow(rowToWrite)
             
-            # TODO: submissionStreak points
-
-            if (student in dualCompStudents):
-                points += 15
-            
-            rowToWrite.append(points)
-            
-            csv_writer.writerow(rowToWrite)
-        
-        print(csv_buff)
-        return csv_buff
+            # return csv_buff
 
     def convertCSVStrToDT(self, csvDateTime: str) -> datetime:
         # convert month, day, hour str datetime parts to be zero-padded for parsing with strptime
@@ -124,21 +125,23 @@ class DataHandler:
         return baseDateTime
 
     def didStudentPassTests(self, csvRow: list[str]) -> bool:
-        # "1 passed of 1"
-        # parse Test Result column
-        splitTestResult = csvRow[2].split(' ')
+        # Test Result column format is: "1 passed of 1"
+        
+        splitTestResult = csvRow[2].split(' ')  # parse Test Result column
 
+        # index 0 is the first number, number of test cases passwed
+        # index 3 is the second number, total number of test cases
         if splitTestResult[0] == splitTestResult[3]:
             return True
         else:
             return False
 
     def calcTimeBetweenSubmissionDueDate(self, submissionDT: datetime, dueDateDT: datetime) -> timedelta | int:
-        # determine if submissions occur after due date, helper func
+        # determine if submissions occur after due date
         if (submissionDT < dueDateDT):
             return dueDateDT - submissionDT
-        else:  # if the student submitted after due date
-            return -1
+        else:  
+            return -1  # if the student submitted after due date
 
     def didStudentSubmitOnTime(self, submissionDT: datetime, dueDateDT: datetime) -> bool:
         if (submissionDT < dueDateDT):
@@ -146,8 +149,13 @@ class DataHandler:
         else:
             return False
 
-    def determineFirstNSubmissions(self, csvData: list[list[str]], n: int, dueDate: datetime) -> list[str]:
-        allStudents = [[]]
+    def determineFirstNSubmissions(self, n: int, dueDate: datetime, isWeekOne: bool = True) -> list[str]:
+        if (isWeekOne):
+            csvData = self.csvData1
+        else:
+            csvData = self.csvData2
+        
+        allStudents = []
         cleanedCsvData = [[]]
 
         # clean csvData to make sure we are only including students who have passed all test cases and submitted on time
@@ -155,9 +163,7 @@ class DataHandler:
 
         # populate allStudents with list of all student names and their timedelta due date datetime - submission datetime, (largest value will be considered more early)
         for row in cleanedCsvData:
-            allStudents.append([row[1], self.calcTimeBetweenSubmissionDueDate(self.convertCSVStrToDT(cleanedCsvData[4]), dueDate)])
-
-        allStudents.pop(0)  # remove first index which is empty (header)
+            allStudents.append([row[1], self.calcTimeBetweenSubmissionDueDate(self.convertCSVStrToDT(row[4]), dueDate)])
 
         sortedStudents = sorted(allStudents, key=lambda x: x[1], reverse=True)  # sort students by timedelta from due date datetime
 
@@ -175,13 +181,13 @@ class DataHandler:
         
         return completedStudents
 
-    def getDualCompletionStudents(self, csvData1: list[list[str]], csvData2: list[list[str]]) -> list[str]:
+    def getDualCompletionStudents(self) -> list[str]:
         # Helper func for determining which students completed both DD versions for the week
         # create list of names for each csv file as there is one csv for each part of the DD
         # determine which names appear twice, append to return list
 
-        firstAssignmentNames = self.determineCompletedStudents(csvData1)
-        secondAssignmentNames = self.determineCompletedStudents(csvData2)
+        firstAssignmentNames = [i[1] for i in self.determineCompletedStudents(self.csvData1, self.dueDate1DT)]
+        secondAssignmentNames = [i[1] for i in self.determineCompletedStudents(self.csvData2, self.dueDate2DT)]
 
         completedBothNames = []
 
@@ -190,11 +196,11 @@ class DataHandler:
             for name in firstAssignmentNames:
                 if secondAssignmentNames.__contains__(name):
                     completedBothNames.append(name)
-        else:
-            for name in secondAssignmentNames:
-                if firstAssignmentNames.__contains__(name):
-                    completedBothNames.append(name)
+            return completedBothNames
         
+        for name in secondAssignmentNames:
+            if firstAssignmentNames.__contains__(name):
+                completedBothNames.append(name)
         return completedBothNames
     
     def getStreakContinuationStudents(self, allCsvData: list[list[list[str]]]) -> list[str] | int:
@@ -203,4 +209,4 @@ class DataHandler:
 
 
 _datahandler = DataHandler('/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/submission_done.csv', '/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/submission_done2.csv')
-_datahandler.createOutputFile(True, 5, False, [], True)
+print(_datahandler.createOutputFile(True, 10, 10, False, [], 10, True, 10))

@@ -32,8 +32,13 @@ class DataHandler:
         
         return data
 
-    def getListOfStudents(self):
-        return [row[1] for row in self.csvData1]
+    def getListOfStudents(self) -> list[str]:
+        # we use the csv file with the most students
+        # if a student submits only one DD for the week, their name will not be in both data objs
+        if len(self.csvData1) > len(self.csvData2):
+            return [row[1] for row in self.csvData1]
+        
+        return [row[1] for row in self.csvData2]
 
     def createOutputFile(self, nSubmissions: bool = False, n: int = 5, submissionStreak: bool = False, streakWeeks: list[int] = [], dualComp: bool = False) -> io.StringIO:
         if nSubmissions:
@@ -150,8 +155,7 @@ class DataHandler:
 
         # populate allStudents with list of all student names and their timedelta due date datetime - submission datetime, (largest value will be considered more early)
         for row in cleanedCsvData:
-            pass
-            # allStudents.append([row[1], self.calcTimeBetweenSubmissionDueDate(self.convertCSVStrToDT(cleanedCsvData[4]), dueDate)])
+            allStudents.append([row[1], self.calcTimeBetweenSubmissionDueDate(self.convertCSVStrToDT(cleanedCsvData[4]), dueDate)])
 
         allStudents.pop(0)  # remove first index which is empty (header)
 
@@ -176,8 +180,8 @@ class DataHandler:
         # create list of names for each csv file as there is one csv for each part of the DD
         # determine which names appear twice, append to return list
 
-        # firstAssignmentNames = self.determineCompletedStudents(csvData1)
-        # secondAssignmentNames = self.determineCompletedStudents(csvData2)
+        firstAssignmentNames = self.determineCompletedStudents(csvData1)
+        secondAssignmentNames = self.determineCompletedStudents(csvData2)
 
         completedBothNames = []
 

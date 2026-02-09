@@ -1,15 +1,10 @@
-const addWeekBtn = document.getElementById("add_week_btn");
-const weekContainer = document.getElementById("weekly_bit_rewards_container");
-const weekCountElem = document.getElementById("weekCount");
+const container = document.getElementById("weekly_bit_rewards_container");
+const addButton = document.getElementById("add_week_btn");
+const totalForms = document.getElementById("id_form-TOTAL_FORMS");
 
-
-function addWeek(){
-    let weekCount = weekCountElem.innerText;
-    weekCount++;
-    weekCountElem.innerText = weekCount;
-
-    // can't just paste desired HTML to innerHTML because it won't get formatted by daisyUI
-    // need to create each element, nest them, and add individual classes
+addButton.addEventListener("click", () => {
+    const formCount = parseInt(totalForms.value);
+    
     const newWeekElem = document.createElement('li');
     const newWeekElemDiv = document.createElement('div');
     const newWeekElemP = document.createElement('p');
@@ -40,10 +35,10 @@ function addWeek(){
     newWeekElemFieldset.appendChild(newWeekElemValidatorP);
 
     // add formatting / daisyUI classes / other attributes
-    newWeekElemDiv.classList.add('flex', 'flex-row', 'pb-2', 'gap-x-2');
+    newWeekElemDiv.classList.add('flex', 'flex-row', 'pb-2', 'gap-x-2', 'form-row');
     
     newWeekElemP.classList.add('self-center', 'px-1', 'test-sm', 'text-base-content');
-    newWeekElemP.innerText = 'Week ' + weekCount;
+    newWeekElemP.innerText = 'Week ' + formCount;
     
     newWeekElemInput.classList.add('required', 'input', 'input-primary', 'validator', 'w-80');
     newWeekElemInput.type = 'number';
@@ -53,36 +48,40 @@ function addWeek(){
     newWeekElemInput.id = 'id_bitRewards';
 
     newWeekElemValidatorP.classList.add('hidden', 'validator-hint');
+    newWeekElemValidatorP.textContent = "Invalid Amount";
 
-    newWeekElemDeleteBtn.classList.add('btn', 'btn-error', 'w-20');
+    newWeekElemDeleteBtn.classList.add('btn', 'btn-error', 'w-20', 'text-sm', 'remove-form');
     newWeekElemDeleteBtn.type = 'button';
     newWeekElemDeleteBtn.innerText = 'Remove';
-    newWeekElemDeleteBtn.addEventListener('click', removeSelf);
 
-    // add elements
-    weekContainer.appendChild(newWeekElem);
-    weekContainer.scrollTop = weekContainer.scrollHeight;
+    newWeekElem.innerHTML = newWeekElem.innerHTML.replace(
+        /form-(\d)+/g,
+        `form-${formCount}`
+    );
 
-    if (weekCount == 20){
-        addWeekBtn.disabled = true;
+    container.appendChild(newWeekElem);
+    totalForms.value = parseInt(totalForms.value) + 1;
+
+    if (totalForms.value == 20){
+        addButton.disabled = true;
     }
     else{
-        addWeekBtn.disabled = false;
+        addButton.disabled = false;
     }
-}
+});
 
-function removeSelf(){
-    let weekCount = weekCountElem.innerText;
+container.addEventListener("click", e => {
+    if (e.target.classList.contains("remove-form")) {
+        const formRow = e.target.closest(".form-row");
 
-    weekCount--;
-    weekCountElem.innerText = weekCount;
-
-    this.parentElement.parentElement.remove();
-
-    if (weekCount == 20){
-        addWeekBtn.disabled = true;
+        // If DELETE exists, mark instead of removing
+        const deleteInput = formRow.querySelector('input[type="checkbox"][name$="DELETE"]');
+        if (deleteInput) {
+            deleteInput.checked = true;
+            formRow.style.display = "none";
+        } else {
+            formRow.remove();
+            totalForms.value = parseInt(totalForms.value) - 1;
+        }
     }
-    else{
-        addWeekBtn.disabled = false;
-    }
-}
+});

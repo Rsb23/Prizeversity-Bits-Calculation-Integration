@@ -183,6 +183,61 @@
 }
 @layer utilities {
   @layer daisyui.l1.l2.l3 {
+    .modal {
+      pointer-events: none;
+      visibility: hidden;
+      position: fixed;
+      inset: calc(0.25rem * 0);
+      margin: calc(0.25rem * 0);
+      display: grid;
+      height: 100%;
+      max-height: none;
+      width: 100%;
+      max-width: none;
+      align-items: center;
+      justify-items: center;
+      background-color: transparent;
+      padding: calc(0.25rem * 0);
+      color: inherit;
+      transition: visibility 0.3s allow-discrete, background-color 0.3s ease-out, opacity 0.1s ease-out;
+      overflow: clip;
+      overscroll-behavior: contain;
+      z-index: 999;
+      scrollbar-gutter: auto;
+    }
+    .modal::backdrop {
+      display: none;
+    }
+  }
+  @layer daisyui.l1.l2 {
+    .modal.modal-open, .modal[open], .modal:target, .modal-toggle:checked + .modal {
+      pointer-events: auto;
+      visibility: visible;
+      opacity: 100%;
+      transition: visibility 0s allow-discrete, background-color 0.3s ease-out, opacity 0.1s ease-out;
+      background-color: oklch(0% 0 0/ 0.4);
+    }
+    .modal.modal-open .modal-box, .modal[open] .modal-box, .modal:target .modal-box, .modal-toggle:checked + .modal .modal-box {
+      translate: 0 0;
+      scale: 1;
+      opacity: 1;
+    }
+    :root:has(.modal.modal-open), :root:has(.modal[open]), :root:has(.modal:target), :root:has(.modal-toggle:checked + .modal) {
+      --page-has-backdrop: 1;
+      --page-overflow: hidden;
+      --page-scroll-bg: var(--page-scroll-bg-on);
+      --page-scroll-gutter: stable;
+      --page-scroll-transition: var(--page-scroll-transition-on);
+      animation: set-page-has-scroll forwards;
+      animation-timeline: scroll();
+    }
+    @starting-style {
+      .modal.modal-open, .modal[open], .modal:target, .modal-toggle:checked + .modal {
+        opacity: 0%;
+      }
+    }
+  }
+  @layer daisyui.l1.l2.l3 {
     .tab {
       position: relative;
       display: inline-flex;
@@ -1045,6 +1100,69 @@
     }
   }
   @layer daisyui.l1.l2.l3 {
+    .modal-backdrop {
+      grid-column-start: 1;
+      grid-row-start: 1;
+      display: grid;
+      align-self: stretch;
+      justify-self: stretch;
+      color: transparent;
+      z-index: -1;
+    }
+    .modal-backdrop button {
+      cursor: pointer;
+    }
+  }
+  @layer daisyui.l1.l2.l3 {
+    .modal-box {
+      grid-column-start: 1;
+      grid-row-start: 1;
+      max-height: 100vh;
+      width: calc(11/12 * 100%);
+      max-width: 32rem;
+      background-color: var(--color-base-100);
+      padding: calc(0.25rem * 6);
+      transition: translate 0.3s ease-out, scale 0.3s ease-out, opacity 0.2s ease-out 0.05s, box-shadow 0.3s ease-out;
+      border-top-left-radius: var(--modal-tl, var(--radius-box));
+      border-top-right-radius: var(--modal-tr, var(--radius-box));
+      border-bottom-left-radius: var(--modal-bl, var(--radius-box));
+      border-bottom-right-radius: var(--modal-br, var(--radius-box));
+      scale: 95%;
+      opacity: 0;
+      box-shadow: oklch(0% 0 0/ 0.25) 0px 25px 50px -12px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+  }
+  .container {
+    width: 100%;
+  }
+  @media (width >= 40rem) {
+    .container {
+      max-width: 40rem;
+    }
+  }
+  @media (width >= 48rem) {
+    .container {
+      max-width: 48rem;
+    }
+  }
+  @media (width >= 64rem) {
+    .container {
+      max-width: 64rem;
+    }
+  }
+  @media (width >= 80rem) {
+    .container {
+      max-width: 80rem;
+    }
+  }
+  @media (width >= 96rem) {
+    .container {
+      max-width: 96rem;
+    }
+  }
+  @layer daisyui.l1.l2.l3 {
     .filter {
       display: flex;
       flex-wrap: wrap;
@@ -1085,8 +1203,22 @@
       opacity: 0%;
     }
   }
+  @layer daisyui.l1.l2.l3 {
+    .modal-action {
+      margin-top: calc(0.25rem * 6);
+      display: flex;
+      justify-content: flex-end;
+      gap: calc(0.25rem * 2);
+    }
+  }
   .mt-3 {
     margin-top: calc(var(--spacing) * 3);
+  }
+  .mr-1 {
+    margin-right: calc(var(--spacing) * 1);
+  }
+  .mr-3 {
+    margin-right: calc(var(--spacing) * 3);
   }
   .mb-1 {
     margin-bottom: calc(var(--spacing) * 1);
@@ -1122,6 +1254,16 @@
       place-items: center;
     }
   }
+  @layer daisyui.l1.l2.l3 {
+    .fieldset {
+      display: grid;
+      gap: calc(0.25rem * 1.5);
+      padding-block: calc(0.25rem * 1);
+      font-size: 0.75rem;
+      grid-template-columns: 1fr;
+      grid-auto-rows: max-content;
+    }
+  }
   .block {
     display: block;
   }
@@ -1140,11 +1282,17 @@
   .h-8 {
     height: calc(var(--spacing) * 8);
   }
+  .h-9 {
+    height: calc(var(--spacing) * 9);
+  }
   .h-10 {
     height: calc(var(--spacing) * 10);
   }
-  .h-50 {
-    height: calc(var(--spacing) * 50);
+  .h-25 {
+    height: calc(var(--spacing) * 25);
+  }
+  .h-100 {
+    height: calc(var(--spacing) * 100);
   }
   .min-h-screen {
     min-height: 100vh;
@@ -1152,14 +1300,23 @@
   .w-6 {
     width: calc(var(--spacing) * 6);
   }
+  .w-9 {
+    width: calc(var(--spacing) * 9);
+  }
   .w-10 {
     width: calc(var(--spacing) * 10);
+  }
+  .w-20 {
+    width: calc(var(--spacing) * 20);
   }
   .w-30 {
     width: calc(var(--spacing) * 30);
   }
   .w-50 {
     width: calc(var(--spacing) * 50);
+  }
+  .w-75 {
+    width: calc(var(--spacing) * 75);
   }
   .w-80 {
     width: calc(var(--spacing) * 80);
@@ -1172,6 +1329,9 @@
   }
   .w-full {
     width: 100%;
+  }
+  .min-w-100 {
+    min-width: calc(var(--spacing) * 100);
   }
   .flex-grow {
     flex-grow: 1;
@@ -1209,6 +1369,9 @@
   }
   .justify-center {
     justify-content: center;
+  }
+  .justify-end {
+    justify-content: flex-end;
   }
   .justify-start {
     justify-content: flex-start;
@@ -1272,6 +1435,9 @@
     --tw-gradient-position: to bottom right in oklab;
     background-image: linear-gradient(var(--tw-gradient-stops));
   }
+  .bg-none {
+    background-image: none;
+  }
   .from-slate-600 {
     --tw-gradient-from: var(--color-slate-600);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
@@ -1304,8 +1470,14 @@
   .px-1 {
     padding-inline: calc(var(--spacing) * 1);
   }
-  .px-3 {
-    padding-inline: calc(var(--spacing) * 3);
+  .pt-4 {
+    padding-top: calc(var(--spacing) * 4);
+  }
+  .pb-2 {
+    padding-bottom: calc(var(--spacing) * 2);
+  }
+  .pb-4 {
+    padding-bottom: calc(var(--spacing) * 4);
   }
   .text-center {
     text-align: center;
@@ -1357,6 +1529,14 @@
   }
   .text-base-content {
     color: var(--color-base-content);
+  }
+  .text-base-content\/50 {
+    color: var(--color-base-content);
+  }
+  @supports (color: color-mix(in lab, red, red)) {
+    .text-base-content\/50 {
+      color: color-mix(in oklab, var(--color-base-content) 50%, transparent);
+    }
   }
   .text-error {
     color: var(--color-error);
@@ -1422,6 +1602,74 @@
         --btn-border: var(--btn-color);
         --btn-noise: none;
       }
+    }
+  }
+  @layer daisyui.l1 {
+    .btn-soft:not( .btn-active, :hover, :active:focus, :focus-visible, input:checked:not(.filter .btn), :disabled, [disabled], .btn-disabled ) {
+      --btn-shadow: "";
+      --btn-fg: var(--btn-color, var(--color-base-content));
+      --btn-bg: var(--btn-color, var(--color-base-content));
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .btn-soft:not( .btn-active, :hover, :active:focus, :focus-visible, input:checked:not(.filter .btn), :disabled, [disabled], .btn-disabled ) {
+        --btn-bg: color-mix(
+        in oklab,
+        var(--btn-color, var(--color-base-content)) 8%,
+        var(--color-base-100)
+      );
+      }
+    }
+    .btn-soft:not( .btn-active, :hover, :active:focus, :focus-visible, input:checked:not(.filter .btn), :disabled, [disabled], .btn-disabled ) {
+      --btn-border: var(--btn-color, var(--color-base-content));
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .btn-soft:not( .btn-active, :hover, :active:focus, :focus-visible, input:checked:not(.filter .btn), :disabled, [disabled], .btn-disabled ) {
+        --btn-border: color-mix(
+        in oklab,
+        var(--btn-color, var(--color-base-content)) 10%,
+        var(--color-base-100)
+      );
+      }
+    }
+    .btn-soft:not( .btn-active, :hover, :active:focus, :focus-visible, input:checked:not(.filter .btn), :disabled, [disabled], .btn-disabled ) {
+      --btn-noise: none;
+    }
+    @media (hover: none) {
+      .btn-soft:not(.btn-active, :active, :focus-visible, input:checked:not(.filter .btn)):hover {
+        --btn-shadow: "";
+        --btn-fg: var(--btn-color, var(--color-base-content));
+        --btn-bg: var(--btn-color, var(--color-base-content));
+      }
+      @supports (color: color-mix(in lab, red, red)) {
+        .btn-soft:not(.btn-active, :active, :focus-visible, input:checked:not(.filter .btn)):hover {
+          --btn-bg: color-mix(
+          in oklab,
+          var(--btn-color, var(--color-base-content)) 8%,
+          var(--color-base-100)
+        );
+        }
+      }
+      .btn-soft:not(.btn-active, :active, :focus-visible, input:checked:not(.filter .btn)):hover {
+        --btn-border: var(--btn-color, var(--color-base-content));
+      }
+      @supports (color: color-mix(in lab, red, red)) {
+        .btn-soft:not(.btn-active, :active, :focus-visible, input:checked:not(.filter .btn)):hover {
+          --btn-border: color-mix(
+          in oklab,
+          var(--btn-color, var(--color-base-content)) 10%,
+          var(--color-base-100)
+        );
+        }
+      }
+      .btn-soft:not(.btn-active, :active, :focus-visible, input:checked:not(.filter .btn)):hover {
+        --btn-noise: none;
+      }
+    }
+  }
+  @layer daisyui.l1.l2.l3 {
+    .btn-error {
+      --btn-color: var(--color-error);
+      --btn-fg: var(--color-error-content);
     }
   }
   @layer daisyui.l1.l2.l3 {

@@ -1,20 +1,22 @@
 import csv
+import io
 from datetime import datetime, timedelta, timezone
 
 
 class DataHandler:
-    def __init__(self, csvFilePath1: str, csvFilePath2: str):
-        self.csvData1 = self.loadFile(csvFilePath1)
-        self.csvData2 = self.loadFile(csvFilePath2)
+    def __init__(self, csv1: str, csv2: str, decodeFiles: bool = True):
+        
+        if (decodeFiles):
+            self.csvData1 = self.loadFile(csv1)
+            self.csvData2 = self.loadFile(csv2)
+        else:
+            self.csvData1 = csv1
+            self.csvData2 = csv2
         
         self.estTZ = timezone(-timedelta(hours=5))  # EST is 5 hours behind UTC
-        self.dueDateDT = datetime(2025, 11, 25, 0, 0, 0, 0, self.estTZ)
-        
-        # TESTING
-        self.firstTenStudents = self.determineFirstNSubmissions(self.csvData1, 10)
-        self.firstTenStudents2 = self.determineFirstNSubmissions(self.csvData2, 10)
-        self.completedBoth = self.getDualCompletionStudents(self.csvData1, self.csvData2)
-        
+        self.dueDate1DT = datetime(2025, 11, 25, 0, 0, 0, 0, self.estTZ)
+        self.dueDate2DT = datetime(2025, 12, 1, 0, 0, 0, 0, self.estTZ)
+
     def loadFile(self, csvFilePath: str) -> list[list[str]]:
         with open(csvFilePath, newline='') as csv_file:
             dialect = csv.Sniffer().sniff(csv_file.read(1024))  # deduce CSV format and set the reader to use it
@@ -29,7 +31,48 @@ class DataHandler:
                     data.append(row)
         
         return data
-    
+
+    def getListOfStudents(self):
+        return [row[1] for row in self.csvData1]
+
+    def createOutputFile(self, nSubmissions: bool = False, n: int = 5, submissionStreak: bool = False, streakWeeks: list[int] = [], dualComp: bool = False) -> io.StringIO:
+        if nSubmissions:
+            firstTenStudents = self.determineFirstNSubmissions(self.csvData1, 10, self.dueDate1DT)
+            firstTenStudents2 = self.determineFirstNSubmissions(self.csvData2, 10, self.dueDate2DT)
+        
+        if submissionStreak:
+           pass 
+
+        if dualComp:
+            dualCompStudents = self.getDualCompletionStudents(self.csvData1, self.csvData2)
+        
+        # write data
+        csv_buff = io.StringIO()
+        csv_writer = csv.writer(csv_buff, delimiter=',')
+
+        for student in self.getListOfStudents():
+            rowToWrite = []
+            rowToWrite.append(student)
+
+            points = 0
+
+            if (student in firstTenStudents):
+                points += 5
+            if (student in firstTenStudents2):
+                points += 5
+            
+            # TODO: submissionStreak points
+
+            if (student in dualCompStudents):
+                points += 15
+            
+            rowToWrite.append(points)
+            
+            csv_writer.writerow(rowToWrite)
+        
+        print(csv_buff)
+        return csv_buff
+
     def convertCSVStrToDT(self, csvDateTime: str) -> datetime:
         # convert month, day, hour str datetime parts to be zero-padded for parsing with strptime
         splitDTStr = csvDateTime.split(', ')
@@ -92,18 +135,25 @@ class DataHandler:
         else:  # if the student submitted after due date
             return -1
 
-    def determineFirstNSubmissions(self, csvData: list[list[str]], n: int) -> list[str]:
-        # TODO: "N" from settings
-        allStudents = [[]]
+    def didStudentSubmitOnTime(self, submissionDT: datetime, dueDateDT: datetime) -> bool:
+        if (submissionDT < dueDateDT):
+            return True
+        else:
+            return False
 
-        # TODO: get due date from first submission
+    def determineFirstNSubmissions(self, csvData: list[list[str]], n: int, dueDate: datetime) -> list[str]:
+        allStudents = [[]]
+        cleanedCsvData = [[]]
+
+        # clean csvData to make sure we are only including students who have passed all test cases and submitted on time
+        cleanedCsvData = self.determineCompletedStudents(csvData, dueDate)
 
         # populate allStudents with list of all student names and their timedelta due date datetime - submission datetime, (largest value will be considered more early)
-        for row in csvData:
-            if (self.didStudentPassTests(row)):
-                allStudents.append([row[1], self.calcTimeBetweenSubmissionDueDate(self.convertCSVStrToDT(row[4]), self.dueDateDT)])
+        for row in cleanedCsvData:
+            pass
+            # allStudents.append([row[1], self.calcTimeBetweenSubmissionDueDate(self.convertCSVStrToDT(cleanedCsvData[4]), dueDate)])
 
-        allStudents.pop(0)  # remove first index which is empty
+        allStudents.pop(0)  # remove first index which is empty (header)
 
         sortedStudents = sorted(allStudents, key=lambda x: x[1], reverse=True)  # sort students by timedelta from due date datetime
 
@@ -111,14 +161,23 @@ class DataHandler:
         firstNStudents = [i[0] for i in sortedStudents[0:n]]  # create list of ten students without datetimes, just names sorted with first being the earliest completion
 
         return firstNStudents
+    
+    def determineCompletedStudents(self, csvData: list[list[str]], dueDateDT: datetime) -> list[list[str]]:
+        completedStudents = []
+
+        for row in csvData:
+            if (self.didStudentPassTests(row) and self.didStudentSubmitOnTime(self.convertCSVStrToDT(row[4]), dueDateDT)):
+                completedStudents.append(row)
+        
+        return completedStudents
 
     def getDualCompletionStudents(self, csvData1: list[list[str]], csvData2: list[list[str]]) -> list[str]:
         # Helper func for determining which students completed both DD versions for the week
         # create list of names for each csv file as there is one csv for each part of the DD
         # determine which names appear twice, append to return list
 
-        firstAssignmentNames = [row[1] for row in csvData1]
-        secondAssignmentNames = [row[1] for row in csvData2]
+        # firstAssignmentNames = self.determineCompletedStudents(csvData1)
+        # secondAssignmentNames = self.determineCompletedStudents(csvData2)
 
         completedBothNames = []
 
@@ -139,4 +198,5 @@ class DataHandler:
         return -1
 
 
-_datahandler = DataHandler('/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/submission_done.csv', '/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/auto_filled.csv')
+_datahandler = DataHandler('/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/submission_done.csv', '/home/r34_runna/Documents/projects/Prizeversity-Bits-Calculation-Integration/data/submission_done2.csv')
+_datahandler.createOutputFile(True, 5, False, [], True)

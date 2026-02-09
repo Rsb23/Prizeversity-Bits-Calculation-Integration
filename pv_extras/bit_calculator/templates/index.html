@@ -13,6 +13,9 @@
 {% block content %}
 <form action="" enctype="multipart/form-data" method="post">
     {% csrf_token %}
+    {{ formset.management_form }}
+
+    <!-- Main Form -->
     <div class="flex flex-col justify-center gap-y-2">
         {% if file_error %}
             <div class="card bg-base-100 p-5 mb-1 self-center border-1 border-error w-200" id="file_card">
@@ -22,7 +25,7 @@
             <div class="flex flex-row justify-between">
                 <div class="flex flex-row justify-center gap-x-5">
                     <p class="text-lg self-center font-bold text-base-content">Step 1</p>
-                    <p class="text-sm self-center text-base-content">Choose CSV From OnlineGDB</p>
+                    <p class="text-sm self-center text-base-content">Upload CSV Files From OnlineGDB</p>
                 </div>
                 <fieldset>
                     {{ form.file|add_class:"required file-input file-input-primary validator self-center w-100"|attr:"accept:.csv" }}
@@ -58,15 +61,21 @@
                     <p class="text-sm self-center text-base-content">Weekly Bit Rewards</p>
                 </div>
                 <div class="flex flex-col justify-center">
-                    <div class="flex flex-row">
-                        <p class="self-center px-3 text-sm text-base-content">Week 1</p>
-                        <fieldset>
-                            {{ form.bitRewards|add_class:"required input input-primary validator w-100"|attr:"type:number"|attr:"min:0"|attr:"value:5" }}
-                            <p class="hidden validator-hint">Invalid Bit Amount</p>
-                        </fieldset>
-                    </div>
-                    <button id="add_week_btn" onclick="addWeek()"
-                        class="btn bg-primary text-white w-30 h-8 self-center border-0 shadow-none text-xs mt-3">Add Another<button>
+                    <ul class="h-25 p-2 text-sm text-body font-medium overflow-y-scroll" id="weekly_bit_rewards_container">
+                        {% for form in formset %}
+                        <li>
+                            <div class="flex flex-row pb-2 gap-x-2 form-row">
+                                <p class="self-center px-1 text-sm text-base-content">Week 1</p>
+                                <fieldset>
+                                    {{ form.bitRewards|add_class:"required input input-primary validator w-75"|attr:"type:number"|attr:"min:0"|attr:"value:5" }}
+                                    <p class="hidden validator-hint">Invalid Amount</p>
+                                </fieldset>
+                                <button class="btn btn-error w-20 text-sm remove-form">Remove</button>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <button type="button" id="add_week_btn" class="btn bg-primary text-white w-30 h-8 self-center border-0 shadow-none text-xs mt-3 disabled:text-white/50">Add Week</button>
                 </div>
             </div>
         </div>
@@ -102,34 +111,63 @@
             class="btn bg-orange-700 w-80 h-10 border-0 shadow-none text-white disabled:text-white/50 self-center text-center mb-5">Generate</button>
     </div>
 </form>
-<div class="flex flex-row justify-center gap-x-2">
-    <div class="card bg-base-100 p-5 mb-1 self-center w-200">
-        <div class="flex flex-col">
-            <p class="text-base-content self-center text-center font-bold">Uploaded Files</p>
-            <ul class="h-50 p-2 text-sm text-body font-medium overflow-y-scroll" aria-labelledby="dropdownUsersButton">
+<div class="flex flex-row justify-center gap-x-2 pt-4 pb-4 w-full">
+    <div class="card bg-base-100 p-5 mb-1 self-center min-w-100">
+        <p class="text-base-content self-center text-center font-bold">Uploaded Files</p>
+        <div class="flex flex-row justify-start">
+            <ul class="h-100 p-2 text-sm text-body font-medium overflow-y-scroll" aria-labelledby="dropdownUsersButton">
                 {% for uploaded_file in up_files_data %}
-                <li>
-                    <div class="flex flex-row justify-left">
-                        <button class="btn btn-ghost bg-content border-none">
-                            <svg class="w-6 h-6 text-gray-800 dark:text-base-content" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M12 13V4M7 14H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1h-2m-1-5-4 5-4-5m9 8h.01" />
-                            </svg>
+                <li class="p-2">
+                    <div class="flex flex-row">
+                        <form action="/download-uploaded-file/" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-ghost bg-none border-none w-9 h-9 p-1 mr-1">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 17H17.01M17.4 14H18C18.9319 14 19.3978 14 19.7654 14.1522C20.2554 14.3552 20.6448 14.7446 20.8478 15.2346C21 15.6022 21 16.0681 21 17C21 17.9319 21 18.3978 20.8478 18.7654C20.6448 19.2554 20.2554 19.6448 19.7654 19.8478C19.3978 20 18.9319 20 18 20H6C5.06812 20 4.60218 20 4.23463 19.8478C3.74458 19.6448 3.35523 19.2554 3.15224 18.7654C3 18.3978 3 17.9319 3 17C3 16.0681 3 15.6022 3.15224 15.2346C3.35523 14.7446 3.74458 14.3552 4.23463 14.1522C4.60218 14 5.06812 14 6 14H6.6M12 15V4M12 15L9 12M12 15L15 12"></path></svg> 
+                            </button>
+                            <input name="input_file_name" class="hidden" value="{{ uploaded_file.input_file.name }}">
+                            <input name="crn" class="hidden" value="{{ uploaded_file.crn }}">
+                        </form>
+                        <button class="btn btn-ghost bg-none border-none w-9 h-9 p-1 mr-3" onclick="remove_uploaded_file_confirmation_modal.showModal()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M18 6V16.2C18 17.8802 18 18.7202 17.673 19.362C17.3854 19.9265 16.9265 20.3854 16.362 20.673C15.7202 21 14.8802 21 13.2 21H10.8C9.11984 21 8.27976 21 7.63803 20.673C7.07354 20.3854 6.6146 19.9265 6.32698 19.362C6 18.7202 6 17.8802 6 16.2V6M14 10V17M10 10V17" /></svg>
                         </button>
-                        <p class="self-center text-base">{{ uploaded_file.input_file.name }}</p>
+                        <dialog class="modal" id="remove_uploaded_file_confirmation_modal">
+                            <div class="modal-box">
+                                <h3 class="text-lg font-bold">Remove "{{ uploaded_file.input_file.name }}"?</h3>
+                                    <div class="flex flex-row justify-end gap-x-5">
+                                        <div class="modal-action">
+                                            <input class="btn btn-error" type="submit" form="removeUploadedForm" value="Confirm">
+                                        </div>
+                                        <div class="modal-action">
+                                            <form method="dialog">
+                                                <button class="btn btn-soft btn-primary">Close</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                            </div>
+                            <form method="dialog" class="modal-backdrop">
+                                <button>close</button>
+                            </form>
+                        </dialog>
+                        <form action="/remove-uploaded-file/" method="post" id="removeUploadedForm">
+                            {% csrf_token %}
+                            <input name="input_file_name" class="hidden" value="{{ uploaded_file.input_file.name }}">
+                            <input name="crn" class="hidden" value="{{ uploaded_file.crn }}">
+                        </form>
+                        <div class="flex flex-col justify-content-start">
+                            <p class="self-center text-base">{{ uploaded_file.input_file.name }}</p>
+                            <p class="text-xs text-base-content/50">{{ uploaded_file.upload_date }} at {{ uploaded_file.upload_time }}</p>
+                            <p class="text-xs text-base-content/50">CRN {{ uploaded_file.crn }}</p>
+                        </div>
                     </div>
                 </li>
                 {% endfor %}
             </ul>
         </div>
     </div>
-    <div class="card bg-base-100 p-5 mb-1 self-center w-200">
+    <div class="card bg-base-100 p-5 mb-1 self-center min-w-100">
         <div class="flex flex-col">
             <p class="text-base-content self-center text-center font-bold">Generated Files</p>
-            <ul class="h-50 p-2 text-sm text-body font-medium overflow-y-scroll" aria-labelledby="dropdownUsersButton">
+            <ul class="h-100 p-2 text-sm text-body font-medium overflow-y-scroll" aria-labelledby="dropdownUsersButton">
                 {% for generated_file in gen_files_data %}
                 <li>
                     <div class="flex flex-row justify-left">
@@ -152,7 +190,8 @@
 </div>
 {% endblock content %}
 {% block body_js %}
-<script src="{% static 'bit_calculator/checkbox_disable_input.js' %}"></script>
-<script src="{% static 'bit_calculator/generate_btn_state.js' %}"></script>
-<script src="{% static 'bit_calculator/file_validation_error_msg.js' %}"></script>
+<script src="{% static 'bit_calculator/js/checkbox_disable_input.js' %}"></script>
+<script src="{% static 'bit_calculator/js/generate_btn_state.js' %}"></script>
+<script src="{% static 'bit_calculator/js/file_validation_error_msg.js' %}"></script>
+<script src="{% static 'bit_calculator/js/week_widget2.js' %}"></script>
 {% endblock body_js %}

@@ -1,11 +1,14 @@
 let genBtn = document.getElementById('generate_btn');
 
+// used to keep track of additions to dynamic week widget child elements
+let addWeekBtn = document.getElementById('add_week_btn');
+
 let file = document.getElementById('id_file');
 
 let crn = document.getElementById('id_crn');
 
-// will need to iterate through dynamic widget, this is placeholder
-let bitRewards = document.getElementById('id_bitRewards');
+// iterate through dynamic widget container
+let bitRewardsContainer = document.getElementById('weekly_bit_rewards_container');
     
 // need checkbox references to know if we include those inputs
 // FNSB = first n submissions bonus, naming convention
@@ -29,9 +32,15 @@ function setGenerateBtnState(){
     if (crn.value == ""){
         readyToSubmit = false;
     }
-    if (bitRewards.value == ""){
-        readyToSubmit = false;
-    }
+
+    // iterate through bit rewards container checking each child element
+    var bitRewardsChildrenList = bitRewardsContainer.querySelectorAll('.form-row.input');
+    bitRewardsChildrenList.forEach((inputItem) => {
+        if (inputItem.value == ""){
+            readyToSubmit = false;
+        }
+    });
+
     if (FNSBChbx.checked){
         if (FNSBInput.value == ""){
             readyToSubmit = false;
@@ -59,9 +68,12 @@ if (file){
 if (crn){
     crn.addEventListener('change', setGenerateBtnState);
 }
-if (bitRewards){
-    bitRewards.addEventListener('change', setGenerateBtnState);
+
+// dynamic widget event listeners
+if (addWeekBtn){
+    addWeekBtn.addEventListener('click', setGenerateBtnState);
 }
+
 if (FNSBChbx){
     FNSBChbx.addEventListener('change', setGenerateBtnState);
 }

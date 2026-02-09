@@ -1,0 +1,41 @@
+python, django, csv
+black, flake8, pyright
+hosted on pythonanywhere
+
+onlinegdb (CSV file) -> upload to website -> set criteria -> output file
+
+stretch goals:
+    feat: streak mode: strict mode vs flexible mode
+        strict (default): last submission doesnt count for streak
+        flex: last submissions count for streak, but require assignment date release file to be filled out by TA
+    feat: grade normalization
+    feat: sorting by most recent/oldest for all scrollables
+    feat: mobile UI
+    feat: theme persistance on page refresh, render index causes theme to reset
+    feat: scrollable bulk select, download + delete
+    feat: scrollable search by CRN
+
+feat: new features
+fix: bug fixes
+docs: documentation changes
+refactor: code improvements
+test: test updates
+chore: maintenance, config updates
+
+current goals:
+    feat: criteria loaded from CRN
+    refactor: fix criteria widgets
+        add bit reward fields for widgets
+        add N field for widget
+    feat: save config by CRN, frontend save and load btns, django model schema, load on btn
+    feat: semester first week widget, calendar widget
+
+    fix / refactor: backend datetime bug
+    feat: backend streaks support
+    feat: connect backend to frontend, add generated file to generatedfiles table, update scrollable, automatic download on generate btn click
+
+prod milestone:
+    django deployment checklist - https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+    host on pythonanywhere
+    connect domain name
+    setup access for admin panel

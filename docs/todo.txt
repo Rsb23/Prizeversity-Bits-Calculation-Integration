@@ -1,8 +1,0 @@
-Dynamic Weekly Bit Rewards
-    formsets
-        https://stackoverflow.com/questions/5478432/making-a-django-form-class-with-a-dynamic-number-of-fields
-        https://jacobian.org/2010/feb/28/dynamic-form-generation/
-        https://forum.djangoproject.com/t/how-to-add-dynamic-number-of-text-fields-in-django-form/3509
-        https://forum.djangoproject.com/t/django-formset/21448
-        https://forum.djangoproject.com/t/django-formsets-tutorials/9042
-        https://www.brennantymrak.com/articles/django-dynamic-formsets-javascript

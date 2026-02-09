@@ -15,22 +15,11 @@ stretch goals:
     feat: scrollable bulk select, download + delete
     feat: scrollable search by CRN
 
-feat: new features
-fix: bug fixes
-docs: documentation changes
-refactor: code improvements
-test: test updates
-chore: maintenance, config updates
-
 current goals:
     feat: criteria loaded from CRN
-    refactor: fix criteria widgets
-        add bit reward fields for widgets
-        add N field for widget
     feat: save config by CRN, frontend save and load btns, django model schema, load on btn
     feat: semester first week widget, calendar widget
 
-    fix / refactor: backend datetime bug
     feat: backend streaks support
     feat: connect backend to frontend, add generated file to generatedfiles table, update scrollable, automatic download on generate btn click
 
